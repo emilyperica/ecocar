@@ -1,6 +1,7 @@
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+import numpy as np
 import cv2
 
 # known pump geometry
@@ -24,7 +25,6 @@ def process_image(msg):
 def start_node():
     rospy.init_node('detect_pump')
     rospy.loginfo('detect_pump node started')
-    
     rospy.Subscriber("image", Image, process_image)
     rospy.spin()
 
