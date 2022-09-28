@@ -1,4 +1,5 @@
 import rospy
+from sensor_msgs.msg import Image
 
 # known pump geometry
 #  - units are pixels (of half-size image)
