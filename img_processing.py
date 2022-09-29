@@ -33,49 +33,61 @@ class ImageSubscriber(Node):
         Callback function.
         """
         # Display the message on the console
-        self.get_logger().info('Receiving video frame')
+        self.get_logger().info('Receiving video')
 
         # Convert ROS Image message to OpenCV image
         current_frame = self.br.imgmsg_to_cv2(data)
+        
         try:
-            orig = current_frame.imgmsg_to_cv2(msg, "bgr8")
-            drawImg = orig
-
-            gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-            drawImg = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-            # threshold grayscale to binary (black & white) image
-            threshVal = 75
-            ret,thresh = cv2.threshold(gray, threshVal, 255, cv2.THRESH_BINARY)
-            drawImg = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
-            self.detection()
+           #self.eyes_detection(current_frame)
+           self.face_detection(current_frame)
         except Exception as e:
             print e
         
-    def detection(self):
-        cap = cv2.VideoCapture(0)
+    def eyes_detection(self, frame):
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
-        while True:
-            ret, frame = cap.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 5)
+            roi_gray = gray[y:y+w, x:x+w]
+            roi_color = frame[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 5)
+            for (ex, ey, ew, eh) in eyes:
+                cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 5)
 
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 5)
-                roi_gray = gray[y:y+w, x:x+w]
-                roi_color = frame[y:y+h, x:x+w]
-                eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 5)
-                for (ex, ey, ew, eh) in eyes:
-                    cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 5)
-
-            cv2.imshow('frame', frame)
-
-            if cv2.waitKey(1) == ord('q'):
-                break
+        cv2.imshow('frame', frame)
 
         cap.release()
         cv2.destroyAllWindows()
+        
+    def face_detection(self, frame):
+        face_cascade = cv2.CascadeClassifier(frame)
+        image = cv2.imread(frame)
+        grayimg = cv2.cvtCOlor(image, cv2.COLOR_BGR2GRAY)
+        
+        faces = face_cascade.detectMultiScale(grayImage)
+        print type(faces)
+
+        if len(faces) == 0:
+            pass
+
+        else:
+            print faces
+            print faces.shape
+
+            for (x,y,w,h) in faces:
+                cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
+
+            cv2.rectangle(image, ((0,image.shape[0] -25)),(270, image.shape[0]), (255,255,255), -1)
+            cv2.putText(image, "Number of faces detected: " + str(faces.shape[0]), (0,image.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,0), 1)
+
+            cv2.imshow('Image with faces',image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
     
     
     
