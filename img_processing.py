@@ -1,61 +1,55 @@
+import rclpy
+from rclpy.node import Node
 from sensor_msgs.msg import Image
+<<<<<<< HEAD
 from cv_bridge import CvBridge
 import numpy as np
+=======
+>>>>>>> c288663bbcb9b372d969e02c6784fe1d12f4da29
 import cv2
 import numpy as np
     
-    
-import rclpy
-from rclpy.node import Node
 
 class ImageSubscriber(Node):
-  """
-  Create an ImageSubscriber class, which is a subclass of the Node class.
-  """
-  def __init__(self):
+    """
+    Create an ImageSubscriber class, which is a subclass of the Node class.
+    """
+    def __init__(self):
     """
     Class constructor to set up the node
     """
     # Initiate the Node class's constructor and give it a name
     super().__init__('image_subscriber')
-      
+
     # Create the subscriber. This subscriber will receive an Image
     # from the video_frames topic. The queue size is 10 messages.
     self.subscription = self.create_subscription(
-      Image, 
-      'video_frames', 
-      self.listener_callback, 
-      10)
+        Image, 
+        'video_frames', 
+        self.listener_callback, 
+        10)
     self.subscription # prevent unused variable warning
-      
+
     # Used to convert between ROS and OpenCV images
     self.br = CvBridge()
    
-  def listener_callback(self, data):
-    """
-    Callback function.
-    """
-    # Display the message on the console
-    self.get_logger().info('Receiving video frame')
- 
-    # Convert ROS Image message to OpenCV image
-    current_frame = self.br.imgmsg_to_cv2(data)
-    
-    
-def process_image(msg):
-    try:
-        # convert sensor_msgs/Image to OpenCV Image
-        bridge = CvBridge()
-        orig = bridge.imgmsg_to_cv2(msg, "bgr8")
-        drawImg = orig
+    def listener_callback(self, data):
+        """
+        Callback function.
+        """
+        # Display the message on the console
+        self.get_logger().info('Receiving video')
+
+        # Convert ROS Image message to OpenCV image
+        current_frame = self.br.imgmsg_to_cv2(data)
         
-        gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-        drawImg = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        # threshold grayscale to binary (black & white) image
-        threshVal = 75
-        ret,thresh = cv2.threshold(gray, threshVal, 255, cv2.THRESH_BINARY)
-        drawImg = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+        try:
+           #self.eyes_detection(current_frame)
+           self.face_detection(current_frame)
+        except Exception as e:
+            print e
         
+<<<<<<< HEAD
     except Exception as err:
         print err
     # show results
@@ -69,6 +63,53 @@ def start_node():
     rospy.spin()
 
 =======
+=======
+    def eyes_detection(self, frame):
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 5)
+            roi_gray = gray[y:y+w, x:x+w]
+            roi_color = frame[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 5)
+            for (ex, ey, ew, eh) in eyes:
+                cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 5)
+
+        cv2.imshow('frame', frame)
+
+        cap.release()
+        cv2.destroyAllWindows()
+        
+    def face_detection(self, frame):
+        face_cascade = cv2.CascadeClassifier(frame)
+        image = cv2.imread(frame)
+        grayimg = cv2.cvtCOlor(image, cv2.COLOR_BGR2GRAY)
+        
+        faces = face_cascade.detectMultiScale(grayImage)
+        print type(faces)
+
+        if len(faces) == 0:
+            pass
+
+        else:
+            print faces
+            print faces.shape
+
+            for (x,y,w,h) in faces:
+                cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),1)
+
+            cv2.rectangle(image, ((0,image.shape[0] -25)),(270, image.shape[0]), (255,255,255), -1)
+            cv2.putText(image, "Number of faces detected: " + str(faces.shape[0]), (0,image.shape[0] -10), cv2.FONT_HERSHEY_TRIPLEX, 0.5,  (0,0,0), 1)
+
+            cv2.imshow('Image with faces',image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+    
+>>>>>>> c288663bbcb9b372d969e02c6784fe1d12f4da29
     
     
 def main(args=None):
