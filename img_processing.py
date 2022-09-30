@@ -1,15 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-<<<<<<< HEAD
-<<<<<<< HEAD
 from cv_bridge import CvBridge
-import numpy as np
-=======
->>>>>>> c288663bbcb9b372d969e02c6784fe1d12f4da29
-=======
 from std_msgs.mdg import String
->>>>>>> 7ed6a3d5e8713a0309ea396b74b39661f41c989c
 import cv2
 import numpy as np
     
@@ -53,12 +46,10 @@ class ImageSubscriber(Node):
         except Exception as e:
             print e
         
-<<<<<<< HEAD
     except Exception as err:
         print err
     # show results
     showImage(drawImg)
-<<<<<<< HEAD
 
 def start_node():
     rospy.init_node('detect_pump')
@@ -66,8 +57,6 @@ def start_node():
     rospy.Subscriber("image", Image, process_image)
     rospy.spin()
 
-=======
-=======
     def eyes_detection(self, frame):
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -112,9 +101,7 @@ def start_node():
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-    
->>>>>>> c288663bbcb9b372d969e02c6784fe1d12f4da29
-    
+        
     
 def main(args=None):
   # Initialize the rclpy library
@@ -134,7 +121,6 @@ def main(args=None):
   # Shutdown the ROS client library for Python
   rclpy.shutdown()
   
->>>>>>> 1832ee61018802c6c58decff12fa30e9c601bbcd
 if __name__ == '__main__':
   main()
     
